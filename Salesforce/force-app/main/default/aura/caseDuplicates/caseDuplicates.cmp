@@ -1,0 +1,50 @@
+<aura:component implements="flexipage:availableForAllPageTypes, force:hasRecordId" access="global" controller="CaseDuplicateController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="isEmptyCases" type="Boolean" default="false"/>
+    <aura:attribute name="cases" type="List"/>
+    <lightning:layout class="slds-page-header slds-page-header_object-home">
+        <lightning:layoutItem>
+            <lightning:icon iconName="standard:scan_card" alternativeText="Case Duplicates"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem padding="horizontal-small">
+            <div class="page-section page-header">
+                <h2 class="slds-text-heading_medium">Case duplicates</h2>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    <lightning:layout class="slds-page-header slds-page-header_object-home" >
+        <lightning:layoutItem  size="12">
+            <aura:if isTrue="{!v.isEmptyCases}">
+                <div class="page-section page-header">
+                    <h3 class="slds-text-heading_medium">We found no potential duplicates of this Case.</h3>
+                </div>
+                <aura:set attribute="else">
+                    <table class='table table-bordered  table-striped'>
+                        <thead>
+                            <tr>
+                                <th id='caseNumber' >Case Number </th>
+                                <th id='caseOrigin' class="slds-p-left_xxx-small">Case Origin</th>
+                                <th id='suppliedEmail' class="slds-p-left_xxx-small">Supplied Email</th> 
+                                <th id='Status' class="slds-var-p-left_xxx-small">Status</th>
+                                <th id='Reason' class="slds-p-left_xxx-small">Reason</th>
+                                <th id='Owner' class="slds-p-left_xxx-small">Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.cases}" var="case">
+                                <tr>
+                                    <td><p>{!case.CaseNumber}</p></td>
+                                    <td class="slds-p-left_xxx-small"><p>{!case.caseOrigin}</p></td>
+                                    <td class="slds-p-left_xxx-small"><p>{!case.suppliedEmail}</p></td>
+                                    <td class="slds-p-left_xxx-small"><p>{!case.Status}</p></td>
+                                    <td class="slds-p-left_xxx-small"><p>{!case.Reason}</p></td>
+                                    <td class="slds-p-left_xxx-small"><p>{!case.Owner.Name}</p></td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </aura:set>
+            </aura:if>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>	
