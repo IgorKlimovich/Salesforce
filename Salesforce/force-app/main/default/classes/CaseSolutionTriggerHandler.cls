@@ -5,34 +5,32 @@ public class CaseSolutionTriggerHandler {
         
         Set<Case_Solution__c> caseSolutionSetForUpdate = new Set<Case_Solution__c>();
         Set<Case> caseSetForUpdate  = new Set<Case>();
-        Set<Id> caseIds= new Set<Id>();
+        Set<Id> caseIds = new Set<Id>();
         for (Case_Solution__c cs: caseSolutionsNew) {
             caseIds.add(cs.Case__c);
         }
-        Map<Id,Case> caseWithCaseSolutions =
-        new Map<Id,Case>([SELECT id,(SELECT id FROM Case_Solutions__r) FROM Case WHERE id IN: caseIds]);
+        Map<Id,Case> caseWithCaseSolutions = CaseDuplicateControllerManager.getCaseWithCaseSolutions(caseIds);
         
         for(Case_Solution__c caseSolution : caseSolutionsNew){
-            if(caseSolutionOldMap.get(caseSolution.id).Solution_Results__c!='Resolved via call' &&
-            caseSolutionOldMap.get(caseSolution.id).Solution_Results__c!='Resolved in advance'  ) {
-                if(caseSolution.Solution_Results__c=='Resolved via call'||caseSolution.Solution_Results__c=='Resolved in advance'){
+            if(caseSolutionOldMap.get(caseSolution.id).Solution_Results__c != CaseSolutionTriggerConstants.RESOLVED_VIA_CALL &&
+            caseSolutionOldMap.get(caseSolution.id).Solution_Results__c != CaseSolutionTriggerConstants.RESOLVED_IN_ADVANCE) {
                     Case caseForUpdate = caseWithCaseSolutions.get(caseSolution.Case__c);
-                    caseForUpdate.Status='Resolved';
+                    caseForUpdate.Status = CaseSolutionTriggerConstants.RESOLVED;
                     caseSetForUpdate.add(caseForUpdate);
-                    List<Case_Solution__c> caseSolutions =caseForUpdate.Case_Solutions__r;
+                    List<Case_Solution__c > caseSolutions = caseForUpdate.Case_Solutions__r;
                     for(Case_Solution__c casSol: caseSolutions){
-                        if (casSol.id!=caseSolution.id) {
-                            casSol.Solution_Results__c='Cancelled';
+                        if (casSol.id != caseSolution.id) {
+                            casSol.Solution_Results__c = CaseSolutionTriggerConstants.CANCELLED;
                             caseSolutionSetForUpdate.add(casSol);   
                         }
                     }
-                }
+                
             }
         }
-        if (caseSolutionSetForUpdate.size()>0) {
+        if (caseSolutionSetForUpdate.size() > 0) {
             update new List<Case_Solution__c>(caseSolutionSetForUpdate);
         }
-        if (caseSetForUpdate.size()>0) {
+        if (caseSetForUpdate.size() > 0) {
             update new List<Case>(caseSetForUpdate);
         }
     }
