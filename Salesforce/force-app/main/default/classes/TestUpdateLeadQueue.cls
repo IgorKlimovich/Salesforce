@@ -1,60 +1,50 @@
 @isTest
 public class TestUpdateLeadQueue {
-   
-    public static String CRON_EXP = '0 0 0/1 1/1 * ? *';
 
     @isTest
     public static void testScheduledJobOpenOneRecord(){
-        TestDataFactoryUpdateLeadQueue.createLeads(1, 'Open - not Contacted');      
+        TestDataFactoryUpdateLeadQueue.createLeads(1, UpdateLeadBatchConstants.OPEN_NOT_CONTACTED);      
         Test.startTest();
-        UpdateLeadQueue ulq = new UpdateLeadQueue();
-        String jobId = System.schedule('ScheduledApexTest', CRON_EXP, ulq);
-        ulq.execute(null);
-        Lead leadBeforeUpdate = [SELECT id, OwnerId FROM Lead LIMIT 1];
+        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
+        Lead leadBeforeUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
         Test.stopTest();
-        Lead leadAfterUpdate = [SELECT id, OwnerId FROM Lead LIMIT 1];
+        Lead leadAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
         System.assertNotEquals(leadBeforeUpdate.OwnerId, leadAfterUpdate.OwnerId);
     }
 
     @isTest
     public static void testScheduledJobCloseOneRecord(){
-        TestDataFactoryUpdateLeadQueue.createLeads(1,'Closed - Converted');
+        TestDataFactoryUpdateLeadQueue.createLeads(1, UpdateLeadBatchConstants.CLOSED_CONVERTED);
         Test.startTest();
-        Lead leadBeforeUpdate = [SELECT id, OwnerId from Lead limit 1];
-        UpdateLeadQueue ulq = new UpdateLeadQueue();
-        String jobId = System.schedule('ScheduledApexTest', CRON_EXP, ulq);
-        ulq.execute(null);
+        Lead leadBeforeUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
+        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
         Test.stopTest();
-        Lead leadAfterUpdate = [SELECT id, OwnerId from Lead LIMIT 1];
+        Lead leadAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
         System.assertEquals(leadBeforeUpdate.OwnerId, leadAfterUpdate.OwnerId);
     }
     
     @isTest
     public static void testScheduledJobOpenManyRecords(){
-        TestDataFactoryUpdateLeadQueue.createLeads(200, 'Open - not Contacted');
+        TestDataFactoryUpdateLeadQueue.createLeads(200, UpdateLeadBatchConstants.OPEN_NOT_CONTACTED);
         Test.startTest();
-        Map<Id,Lead> leadsMap = new Map<Id,Lead>([SELECT id, OwnerId FROM Lead]);
-        UpdateLeadQueue ulq = new UpdateLeadQueue();
-        String jobId = System.schedule('ScheduledApexTest', CRON_EXP, ulq);
-        ulq.execute(null);
+        Map<Id,Lead> leadsMap = new Map<Id,Lead>(TestDataFactoryUpdateLeadQueue.getTestLeadList());
+        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
         Test.stopTest();
-        List<Lead> leadsAfterUpdate = [SELECT id, OwnerId FROM Lead];
-        for(Lead lead : leadsAfterUpdate ){
+        List<Lead> leadsAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLeadList();
+        for(Lead lead: leadsAfterUpdate ){
             System.assertNotEquals(lead.OwnerId, leadsMap.get(lead.id).OwnerId);
         }
     }
 
     @isTest
     public static void testScheduledJobCloseManyRecords(){
-        TestDataFactoryUpdateLeadQueue.createLeads(200, 'Closed - Converted');
+        TestDataFactoryUpdateLeadQueue.createLeads(200, UpdateLeadBatchConstants.CLOSED_CONVERTED);
         Test.startTest();
-        Map<Id,Lead> leadsMap = new Map<Id,Lead>([SELECT id, OwnerId FROM Lead]);
-        UpdateLeadQueue ulq = new UpdateLeadQueue();
-        String jobId = System.schedule('ScheduledApexTest', CRON_EXP, ulq);
-        ulq.execute(null);
+        Map<Id,Lead> leadsMap = new Map<Id,Lead>(TestDataFactoryUpdateLeadQueue.getTestLeadList());
+        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
         Test.stopTest();
-        List<Lead> leadsAfterUpdate = [SELECT id, OwnerId FROM Lead];
-        for(Lead lead : leadsAfterUpdate ){
+        List<Lead> leadsAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLeadList();
+        for(Lead lead: leadsAfterUpdate ){
             System.assertEquals(lead.OwnerId, leadsMap.get(lead.id).OwnerId);
         }
     }
