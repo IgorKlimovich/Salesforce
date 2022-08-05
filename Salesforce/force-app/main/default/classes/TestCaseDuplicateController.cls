@@ -1,18 +1,23 @@
 @isTest
 public class TestCaseDuplicateController {
-    
+
     @isTest
-    public static void testOneCaseWithSameId(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(1,'New','','','');
+    public static void testNull(){
+        Boolean exceptionOccurred = false;
+        try {
         Test.startTest();
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCases[0].id);
-        Test.stopTest();
-        System.assertEquals(0,casesFromController.size());
+        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(null);
+        Test.stopTest();   
+        } catch (AuraHandledException ex) {
+            exceptionOccurred = true;
+        }
+        System.assert(exceptionOccurred);
     }
 
     @isTest
-    public static void testManyCasesNotClosed(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'New','','','');
+    public static void testCasesClosedSameSuppliedEmail(){
+        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases
+        (3,CaseDuplicatesControllerConstants.CLOSED_STATUS, CaseDuplicatesControllerConstants.TEST_EMAIL);
         Test.startTest();
         Case testCase = testCases[0];
         List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
@@ -21,72 +26,16 @@ public class TestCaseDuplicateController {
     }
 
     @isTest
-    public static void testManyCasesClosed(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'Closed','','','');
-        Test.startTest();
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCases[0].id);
-        Test.stopTest();
-        System.assertEquals(0,casesFromController.size());
-    }
-
-    @isTest
-    public static void testManyCasesNotClosedSameSubject(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'New','Test','','');
+    public static void testCasesOpenSameSuppliedEmail(){
+        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases
+        (3, CaseDuplicatesControllerConstants.NEW_STATUS, CaseDuplicatesControllerConstants.TEST_EMAIL);
         Test.startTest();
         Case testCase = testCases[0];
         List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
         Test.stopTest();
-        System.assertEquals(199,casesFromController.size());
-    }
-
-    @isTest
-    public static void testManyCasesClosedSameSubject(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'Closed','Test','','');
-        Test.startTest();
-        Case testCase = testCases[0];
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
-        Test.stopTest();
-        System.assertEquals(0,casesFromController.size());
-    }
-
-    @isTest
-    public static void testManyCasesNotClosedSameReasonName(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'New','','Test','');
-        Test.startTest();
-        Case testCase = testCases[0];
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
-        Test.stopTest();
-        System.assertEquals(199,casesFromController.size());
-    }
-
-    @isTest
-    public static void testManyCasesClosedSameReasonName(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'Closed','','Test','');
-        Test.startTest();
-        Case testCase = testCases[0];
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
-        Test.stopTest();
-        System.assertEquals(0,casesFromController.size());
-    }
-
-
-    @isTest
-    public static void testManyCasesNotClosedSameSuppliedEmail(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'New','','','Test@gmail.com');
-        Test.startTest();
-        Case testCase = testCases[0];
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
-        Test.stopTest();
-        System.assertEquals(199,casesFromController.size());
-    }
-
-    @isTest
-    public static void testManyCasesClosedSameSuppliedEmail(){
-        List<Case> testCases = TestDataFactoryCaseDuplicateController.createCases(200,'Closed','','','Test@gmail.com');
-        Test.startTest();
-        Case testCase = testCases[0];
-        List<Case> casesFromController =CaseDuplicateController.getDuplicatesCases(testCase.id);
-        Test.stopTest();
-        System.assertEquals(0,casesFromController.size());
+        System.assertEquals(2,casesFromController.size());
+        for(Case casse: casesFromController){
+            System.assertEquals(testCase.SuppliedEmail, casse.SuppliedEmail);
+        }
     }
 }

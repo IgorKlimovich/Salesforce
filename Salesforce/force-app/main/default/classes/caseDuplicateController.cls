@@ -1,12 +1,14 @@
 public with sharing class CaseDuplicateController {
-    
+
     @AuraEnabled
     public static List<Case> getDuplicatesCases(Id caseId){
-        Case currentCase=  [SELECT id, Subject, SuppliedEmail, Reason FROM Case WHERE id =:caseId LIMIT 1];
-        List<Case> caseDuplicatesList = [SELECT Subject, CaseNumber,  SuppliedEmail, Reason, Status, Owner.name FROM Case
-        WHERE status !='Closed' AND ((Subject=:currentCase.Subject AND subject !='') OR 
-        (reason=:currentCase.Reason AND reason!='') OR (SuppliedEmail=:currentCase.SuppliedEmail 
-        AND SuppliedEmail!='')) AND id!=:currentCase.id];
-        return  caseDuplicatesList;
+        List<Case> caseDuplicateList = new List<Case>();
+        try {
+            Case currentCase = CaseDuplicateControllerManager.getCurrentCase(caseId);
+            caseDuplicateList = CaseDuplicateControllerManager.getCaseDuplicatesList(currentCase);
+        } catch (Exception e) {        
+            throw new AuraHandledException(e.getMessage());
+        }
+        return caseDuplicateList;
     }
 }
