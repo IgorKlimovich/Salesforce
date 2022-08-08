@@ -29,18 +29,23 @@ public with sharing class UpdateLeadQueueBatch implements Database.Batchable<sOb
 
         List<Lead> sysAdminOpenLeads = UpdateLeadBatchDataManager.getSysAdminOpenLeads(systemAdministratorIds);
         for (Lead lead: sysAdminOpenLeads){
-            QueueSobject queueForAssign = scope.get(0);
-            Integer countLeadsInQueue = QueueWithLeadsMap.get(queueForAssign).size();
-            for (QueueSobject queue: QueueWithLeadsMap.keySet()){
-                if(QueueWithLeadsMap.get(queue).size() < countLeadsInQueue){
-                    countLeadsInQueue = QueueWithLeadsMap.get(queue).size();
-                    queueForAssign = queue;
+            if(QueueWithLeadsMap != null && QueueWithLeadsMap.size()>0){
+                QueueSobject queueForAssign = new QueueSobject();
+                if(scope != null && !scope.isEmpty()){
+                    queueForAssign = scope.get(0);
                 }
+                Integer countLeadsInQueue = QueueWithLeadsMap.get(queueForAssign).size();
+                for (QueueSobject queue: QueueWithLeadsMap.keySet()){
+                    if(QueueWithLeadsMap.get(queue).size() < countLeadsInQueue){
+                        countLeadsInQueue = QueueWithLeadsMap.get(queue).size();
+                        queueForAssign = queue;
+                    }
+                }
+                lead.OwnerId = queueForAssign.QueueId;
+                List<Lead> listLead = QueueWithLeadsMap.get(queueForAssign);
+                listLead.add(lead);
+                leadsForUpdate.add(lead);
             }
-            lead.OwnerId = queueForAssign.QueueId;
-            List<Lead> listLead = QueueWithLeadsMap.get(queueForAssign);
-            listLead.add(lead);
-            leadsForUpdate.add(lead);
         }
         if(leadsForUpdate.size()>0){
             update leadsForUpdate;
