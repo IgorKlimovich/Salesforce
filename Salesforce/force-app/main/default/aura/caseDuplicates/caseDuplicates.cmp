@@ -1,7 +1,14 @@
-<aura:component implements="flexipage:availableForAllPageTypes, force:hasRecordId" access="global" controller="CaseDuplicateController">
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-    <aura:attribute name="isEmptyCases" type="Boolean" default="false"/>
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="CaseDuplicateController">
+    <aura:attribute name="isEmptyCases" type="Boolean" default="true"/>
+    <aura:attribute name="value" type="List"/>
+    <aura:attribute name="options" type="List" default="[
+    {'label': 'Subject', 'value': 'Subject'},
+    {'label': 'Supplied Email', 'value': 'Supplied Email'},
+    {'label': 'Reason','value': 'Reason'}
+    ]"/>
     <aura:attribute name="cases" type="List"/>
+    
+
     <lightning:layout class="slds-page-header slds-page-header_object-home">
         <lightning:layoutItem>
             <lightning:icon iconName="standard:scan_card" alternativeText="Case Duplicates"/>
@@ -12,7 +19,17 @@
             </div>
         </lightning:layoutItem>
     </lightning:layout>
+    <lightning:layout class="slds-page-header slds-page-header_object-home">
+        <lightning:layoutItem>
+            <lightning:checkboxGroup name="Checkbox Group"
+                             label="Select an option to search for a duplicate"
+                             options="{! v.options }"
+                             value="{! v.value }"
+                             onchange="{! c.handleChange }"/>
+        </lightning:layoutItem>
+    </lightning:layout>
     <lightning:layout class="slds-page-header slds-page-header_object-home" >
+
         <lightning:layoutItem  size="12">
             <aura:if isTrue="{!v.isEmptyCases}">
                 <div class="page-section page-header">
@@ -35,7 +52,7 @@
                                 <tr>
                                     <td><p>{!case.CaseNumber}</p></td>
                                     <td class="slds-p-left_xxx-small"><p>{!case.caseOrigin}</p></td>
-                                    <td class="slds-p-left_xxx-small"><p>{!case.suppliedEmail}</p></td>
+                                    <td class="slds-p-left_xxx-small"><p>{!case.SuppliedEmail}</p></td>
                                     <td class="slds-p-left_xxx-small"><p>{!case.Status}</p></td>
                                     <td class="slds-p-left_xxx-small"><p>{!case.Reason}</p></td>
                                     <td class="slds-p-left_xxx-small"><p>{!case.Owner.Name}</p></td>
@@ -47,4 +64,4 @@
             </aura:if>
         </lightning:layoutItem>
     </lightning:layout>
-</aura:component>	
+</aura:component>
