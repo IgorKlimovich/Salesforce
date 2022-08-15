@@ -3,9 +3,9 @@ public class TestUpdateLeadQueue {
 
     @isTest
     public static void testScheduledJobOpenOneRecord(){
-        TestDataFactoryUpdateLeadQueue.createLeads(1, UpdateLeadBatchConstants.OPEN_NOT_CONTACTED);      
+        TestDataFactoryUpdateLeadQueue.createLeads(1, LeadConstants.OPEN_NOT_CONTACTED);
         Test.startTest();
-        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
+        System.schedule(LeadConstants.SCHEDULE_NAME, LeadConstants.CRON_EXP, new UpdateLeadQueue());
         Lead leadBeforeUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
         Test.stopTest();
         Lead leadAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
@@ -14,10 +14,11 @@ public class TestUpdateLeadQueue {
 
     @isTest
     public static void testScheduledJobCloseOneRecord(){
-        TestDataFactoryUpdateLeadQueue.createLeads(1, UpdateLeadBatchConstants.CLOSED_CONVERTED);
+        TestDataFactoryUpdateLeadQueue.createLeads(1, LeadConstants.CLOSED_CONVERTED);
         Test.startTest();
         Lead leadBeforeUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
-        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
+        System.schedule(LeadConstants.SCHEDULE_NAME, LeadConstants.CRON_EXP, new UpdateLeadQueue());
+        ulq.execute(null);
         Test.stopTest();
         Lead leadAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLead();
         System.assertEquals(leadBeforeUpdate.OwnerId, leadAfterUpdate.OwnerId);
@@ -25,10 +26,11 @@ public class TestUpdateLeadQueue {
     
     @isTest
     public static void testScheduledJobOpenManyRecords(){
-        TestDataFactoryUpdateLeadQueue.createLeads(200, UpdateLeadBatchConstants.OPEN_NOT_CONTACTED);
+        TestDataFactoryUpdateLeadQueue.createLeads(200, LeadConstants.OPEN_NOT_CONTACTED);
         Test.startTest();
         Map<Id,Lead> leadsMap = new Map<Id,Lead>(TestDataFactoryUpdateLeadQueue.getTestLeadList());
-        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
+        System.schedule(LeadConstants.SCHEDULE_NAME, LeadConstants.CRON_EXP, new UpdateLeadQueue());
+        ulq.execute(null);
         Test.stopTest();
         List<Lead> leadsAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLeadList();
         for(Lead lead: leadsAfterUpdate ){
@@ -38,10 +40,11 @@ public class TestUpdateLeadQueue {
 
     @isTest
     public static void testScheduledJobCloseManyRecords(){
-        TestDataFactoryUpdateLeadQueue.createLeads(200, UpdateLeadBatchConstants.CLOSED_CONVERTED);
+        TestDataFactoryUpdateLeadQueue.createLeads(200, LeadConstants.CLOSED_CONVERTED);
         Test.startTest();
         Map<Id,Lead> leadsMap = new Map<Id,Lead>(TestDataFactoryUpdateLeadQueue.getTestLeadList());
-        System.schedule(UpdateLeadBatchConstants.SCHEDULE_NAME, UpdateLeadBatchConstants.CRON_EXP, new UpdateLeadQueue());
+        System.schedule(LeadConstants.SCHEDULE_NAME, LeadConstants.CRON_EXP, new UpdateLeadQueue());
+        ulq.execute(null);
         Test.stopTest();
         List<Lead> leadsAfterUpdate = TestDataFactoryUpdateLeadQueue.getTestLeadList();
         for(Lead lead: leadsAfterUpdate ){
